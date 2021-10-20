@@ -2,6 +2,7 @@
 
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
+
 <head>
   <meta charset="utf-8" />
   
@@ -88,9 +89,10 @@
               <!-- Local TOC -->
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">Welcome to MicEMD’s documentation!</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 <li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#api">API</a></li>
 <li><a class="reference internal" href="#Examples">Examples</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 </div>
             
@@ -165,7 +167,7 @@
 <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <textarea cols='20' rows='26'># MicEMD
-Modeling, inversion and classification in electromagnetic underground metal target detection
+Modeling, Inversion and Classification in ElectroMagnetic Detection
 
 Prerequisite: Installing Python and Conda
 
@@ -176,6 +178,8 @@ Installing Packages
 `conda install SimPEG --channel conda-forge`
 
 `conda install pyqt`
+
+`conda install scikit-learn=0.24.2`
 
 
 Run MicEMD
@@ -193,29 +197,46 @@ To start the GUI from source, navigate through the src directory and run mainwin
 </div>
 
 <h2>the GUI is as follows</h2>
+<p>The left of the GUI are two tabs about parameters setting: FDEM detection and TDEM detection. We demonstrate the inversion application based on the FDEM detection and demonstrate the classification application based on the TDEM detection. From top to bottom on the right of the GUI are the tab-based results display, the output of the current program, and function buttons.</p>
 <img src="./image/GUI.png" />
 <p> <br />
-<h2>A more exhaustive list of API methods：</h2>
+<div class="section" id="api">
+<h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+A more exhaustive list of API methods
 <img src="./image/API.jpg" />
+</div>
 <div class="section" id="Examples">
 <h1>Examples<a class="headerlink" href="#Examples" title="Permalink to this headline">¶</a></h1>
-The simulation can be built by following steps:
-1. Firstly, create the target, detector, collection class of the forward modeling, and call the simulate interface to generate the observed data.
+<p>
+The simulation can be built by following steps:<br/>
+1. Firstly, create the target, detector, collection class of the forward modeling, and call the simulate interface to generate the observed data.<br/>
+
 2. Then, for the inversion problem, set the inversion parameters and call
 the inverse interface to estimate the properties of the metal target;
 for the classification problem, call the preprocess interface to reduce
 the dimension of the observed data and call the classify interface to
-classify underground metal targets.
+classify underground metal targets.<br/>
 3. Finally, create the Handler class to analyze, show, and save the results.
-
-<h3>Example 1 FDEM Inversion</h3>
-The example is to show FDEM simulation and the inversion application.
-We simulated the EMI response of the metal cylinder targets in underground environments 
+</p>
+<h2>Example 1: FDEM Inversion</h2>
+<p>
+The example is to show FDEM simulation and the inversion application. We simulated the EMI response of the metal cylinderical targets in underground environments 
 based on FDEM forward modeling and used the least-squares inversion methods to estimate 
 the properties of the metal target conclude the triaxial coordinate(x,y,z), triaxial polarizability(βx,βy,βz), and the orientation(pitch and roll angle) of the metal target. 
-
+</p>
+<h5>Simulation settings</h5>
+Default values of the target parameters<br/>
+<img src="./image/ftarget.jpg" /><br/>
+Default values of the detector parameters
+<img src="./image/fdetector.jpg" /><br/>
+Default values of the collection parameters
+<img src="./image/fcollection.jpg" />
 
 <pre>
+<h5>Main code</h5>
+<span>run the code by 'python article_exam1.py'</span>
+
+<br\>
 <textarea cols='20' rows='26'>
 import numpy as np
 import MicEMD.fdem as fdem
@@ -264,7 +285,45 @@ handler.show_mag_map_default(fwd_res, show=True)
 handler.save_inv_res_default(inv_res, 'BFGS')
 
 </textarea></pre>
-<h3>Example 2 TDEM Classification</h3>
+<h5>Results</h5>
+you can get the forward modeling results in the file path 'MICEMD\src\results\fdemResults\forward_res':
+
+<img src="./image/fsim.jpg" />
+<p>
+The 'magdata.csv' includes the triaxial coordinates of location of the receiver and triaxial induced magnetic field strength:<br/>
+x represents the x-coordinate of the receiver location<br/>
+x represents the y-coordinate of the receiver location<br/>
+x represents the z-coordinate of the receiver location<br/>
+hz represents the induced magnetic field strength of z-axis,<br/>
+hx represents the induced magnetic field strength of x-axis, <br/>
+hy represents the induced magnetic field strength of y-axis.
+</p>
+you can get the inversion results in the file path 'MICEMD\src\results\fdemResults\inv_res'
+<img src="./image/finv.png"/><br/>
+<p>
+The 'BFGS.csv' includes parameters estimates, true values of parameters, and the error of estimates, and parameters estimates include the location of metal targets, the polarizability of metal targets, and the orientation of metal targets.<br/>
+<br/>x,y and z represent the triaxial coordinate, <br/>
+polarizability_1,polarizability_2 and polarizability_3 represent triaxial polarizability,<br/>
+pitch and roll represent the orientation(pitch and roll angle) of the metal target.<br/>
+</p>
+<h3>Example 2: TDEM Classification</h3>
+<p>
+The second example is to show the TDEM forward modeling and the classification application. 
+We simulate the TDEM characteristic attenuation response of metal ellipsoid targets based on the dipole model,
+and we classify the material and shape using the data-based methods based on the artificial neural network classification model and PCA dimensionality reduction algorithm. 
+The shape types of metal targets are divided into two categories according to the aspect ratio which can be calculated by transverse radius divided by the axial radius. 
+If the aspect ratio is greater than 1, the shape is oblate, otherwise, it is prolate. 
+The material types of metal targets are divided into three categories, including steel, nickel(Ni), and aluminum(Al). 
+</p>
+<h5>Simulation settings</h5>
+Default values of the target parameters
+<img src="./image/ttarget.jpg"/><br/>
+Default values of the detector parameters 
+<img src="./image/tdetector.jpg"/><br/>
+Default values of the collection parameters
+<img src="./image/tcollection.jpg"/><br/>
+<h5>Main code</h5>
+<span>run the code by 'python article_exam2.py'</span>
 <pre>
 <textarea cols='20' rows='26'>
 import numpy as np
@@ -337,7 +396,29 @@ handler.show_cls_res(cls_shape_res, ['Oblate spheroid', 'Prolate spheroid'], sho
 handler.save_cls_res(cls_shape_res, 'cls_shape_res.csv')
 </textarea>
 </pre>
+<h5>Results</h5>
+you can get the forward modeling results and the results after dimensionality reduction in the file path 'MICEMD\src\results\tdemResults\forward_res':
+<img src="./image/tsim.jpg" />
+<p>
+The 'fwd_res.csv' includes the observed data generated by TDEM forward modeling.<br/>
+The 'sample.csv' includes one random sample data.<br/>
+The 'ori_shape_train.csv' and 'ori_shape_test.csv' represent the original dataset for shape classification.<br/>
+The 'ori_material_train.csv' and 'ori_material_test.csv' include the original dataset for material classification.<br/>
+The 'dim_shape_train.csv' and 'dim_shape_test.csv' include the finale dataset after dimensionality reduction for shape classification.<br/>
+The 'dim_material_train.csv' and 'dim_material_test.csv' include the finale dataset after dimensionality reduction for material classification.<br/>
+The 'sample.png' is the display of the sample data in 'sample.csv'.<br/>
+</p>
+you can get the inversion results in the file path 'MICEMD\src\results\tdemResults\classify_res'
+<img src="./image/tcls.jpg"/><br/>
+<p>
+The 'cls_material_res.csv' includes the results of material classification.<br/> 
+The 'cls_material_res.csv' includes the results of material classification.<br/> 
+The two files above include the true label, predicted label and the accuracy of the classification.<br/> 
+The 'cls_result_material.pdf' includes the confusion matrix of the material classification results.<br/> 
+The 'cls_result_shape.pdf' includes the confusion matrix of the shape classification results.<br/> 
+</p>
 </div>
+
 
 </div>
 <div class="section" id="indices-and-tables">
